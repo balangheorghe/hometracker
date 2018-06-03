@@ -69,7 +69,7 @@ def api(request):
                 custom_dict['title'] = "<center>{}<br>{}</center>".format(location.username,
                                                                           datetime.datetime.fromtimestamp(
                                                                               location.timestamp
-                                                                              ).strftime(
+                                                                          ).strftime(
                                                                               '%Y-%m-%d %H:%M:%S'))
                 custom_dict['lat'] = location.lat
                 custom_dict['lng'] = location.lng
@@ -80,6 +80,23 @@ def api(request):
                 custom_list.append(custom_dict)
 
             json_stuff = json.dumps(custom_list)
+            return HttpResponse(json_stuff, content_type="application/json")
+        except Exception as e:
+            json_stuff = json.dumps({'success': 1, 'message': '{}'.format(e)})
+            return HttpResponse(json_stuff, content_type="application/json")
+
+
+def delete(request):
+    if request.method == "POST":
+        r_username = request.POST.get('username', '')
+        if r_username == '':
+            json_stuff = json.dumps({'success': 1, 'message': 'missing username'})
+            return HttpResponse(json_stuff, content_type="application/json")
+
+        try:
+            ll = LastLocation.objects.get(username=r_username)
+            ll.delete()
+            json_stuff = json.dumps({'success': 0, 'message': '{}'.format("deleted")})
             return HttpResponse(json_stuff, content_type="application/json")
         except Exception as e:
             json_stuff = json.dumps({'success': 1, 'message': '{}'.format(e)})
