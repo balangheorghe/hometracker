@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geolocation</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+      <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-social/5.1.1/bootstrap-social.css">
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script>
+
+        </script>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+#map {
+  height: 100%;
+  width: 100%;
+  background-color: grey;
+}
+
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+ <div id="map" style="max-height: 80%;"></div>
+   <script>
+    function initMap() {
+  var center = {lat: 34.052235, lng: -118.243683};
+
+
+$.ajax ({
+    url: '/api',
+    dataType: "json",
+    async: false,
+    contentType: "application/json",
+    success: function (jsonData) {
+        // Success callback
+        //alert("sucess");
+        locations = jsonData;
+        center = {lat: locations[0].lat, lng: locations[0].lng}
+    },
+    error: function() {
+        //any error to be handled
+        locations = [];
+        alert("error. please contact gbalan");
+    }
+ });
+ var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 14,
+    center: center
+  });
+  var infowindow =  new google.maps.InfoWindow({});
+var marker, count;
+for (count = 0; count < locations.length; count++) {
+
+    marker = new google.maps.Marker({
+      position: new google.maps.LatLng(locations[count].lat, locations[count].lng),
+      map: map,
+      title: locations[count].title
+    });
+google.maps.event.addListener(marker, 'click', (function (marker, count) {
+      return function () {
+        infowindow.setContent(locations[count].title);
+        infowindow.open(map, marker);
+      }
+    })(marker, count));
+  }
+}
+   </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXYDYmpNXAo01aw71oMT6KJXoI1aTTyvg&libraries=places&callback=initMap"
+        async defer></script>
+  </body>
+</html>
